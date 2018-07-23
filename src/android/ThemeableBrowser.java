@@ -253,14 +253,14 @@ public class ThemeableBrowser extends CordovaPlugin {
             this.callbackContext.sendPluginResult(pluginResult);
         }
         else if (action.equals("reload")) {
-            if (inAppWebView != null) {
-                this.cordova.getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
+            this.cordova.getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (inAppWebView != null) {
                         inAppWebView.reload();
                     }
-                });
-            }
+                }
+            });
         }
         else {
             return false;
@@ -526,6 +526,14 @@ public class ThemeableBrowser extends CordovaPlugin {
         return this;
     }
 
+    private String getCurrentWebviewUrl(){
+        String url = "";
+        if(this.inAppWebView != null){
+            url = this.inAppWebView.getUrl();
+        }
+        return url;
+    }
+
     /**
      * Display a new browser with the specified URL.
      *
@@ -634,7 +642,7 @@ public class ThemeableBrowser extends CordovaPlugin {
                         public void onClick(View v) {
                             emitButtonEvent(
                                     features.backButton,
-                                    inAppWebView.getUrl());
+                                    getCurrentWebviewUrl());
 
                             if (features.backButtonCanClose && !canGoBack()) {
                                 closeDialog();
@@ -657,7 +665,7 @@ public class ThemeableBrowser extends CordovaPlugin {
                         public void onClick(View v) {
                             emitButtonEvent(
                                     features.forwardButton,
-                                    inAppWebView.getUrl());
+                                    getCurrentWebviewUrl());
 
                             goForward();
                         }
@@ -675,9 +683,7 @@ public class ThemeableBrowser extends CordovaPlugin {
                     "close button",
                     new View.OnClickListener() {
                         public void onClick(View v) {
-                            emitButtonEvent(
-                                    features.closeButton,
-                                    inAppWebView.getUrl());
+                            emitButtonEvent(features.closeButton, getCurrentWebviewUrl());
                             closeDialog();
                         }
                     }
@@ -700,7 +706,7 @@ public class ThemeableBrowser extends CordovaPlugin {
                             if (event.getAction() == MotionEvent.ACTION_UP) {
                                 emitButtonEvent(
                                         features.menu,
-                                        inAppWebView.getUrl());
+                                        getCurrentWebviewUrl());
                             }
                             return false;
                         }
@@ -725,7 +731,7 @@ public class ThemeableBrowser extends CordovaPlugin {
                                                 && i < features.menu.items.length) {
                                             emitButtonEvent(
                                                     features.menu.items[i],
-                                                    inAppWebView.getUrl(), i);
+                                                    getCurrentWebviewUrl(), i);
                                         }
                                     }
 
@@ -897,7 +903,7 @@ public class ThemeableBrowser extends CordovaPlugin {
                                 public void onClick(View view) {
                                     if (inAppWebView != null) {
                                         emitButtonEvent(buttonProps,
-                                                inAppWebView.getUrl(), index);
+                                                getCurrentWebviewUrl(), index);
                                     }
                                 }
                             }
@@ -1398,7 +1404,7 @@ public class ThemeableBrowser extends CordovaPlugin {
             }
 
             // Update the UI if we haven't already
-            if (!newloc.equals(edittext.getText().toString())) {
+            if (edittext != null && !newloc.equals(edittext.getText().toString())) {
                 edittext.setText(newloc);
             }
 
